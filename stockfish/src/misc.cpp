@@ -35,6 +35,15 @@
 
 #include "types.h"
 
+#ifdef _WIN32
+    #include <direct.h>
+    #define GETCWD _getcwd
+#else
+    #include <unistd.h>
+    #define GETCWD getcwd
+#endif
+
+
 namespace Stockfish {
 
 namespace {
@@ -433,13 +442,6 @@ void prefetch(const void* addr) {
 
 #endif
 
-#ifdef _WIN32
-    #include <direct.h>
-    #define GETCWD _getcwd
-#else
-    #include <unistd.h>
-    #define GETCWD getcwd
-#endif
 
 size_t str_to_size_t(const std::string& s) {
     unsigned long long value = std::stoull(s);

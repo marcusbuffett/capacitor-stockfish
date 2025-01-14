@@ -1,22 +1,18 @@
 #include <iostream>
 #include "../../stockfish/src/bitboard.h"
-#include "../../stockfish/src/endgame.h"
+#include "../../stockfish/src/misc.h"
 #include "../../stockfish/src/position.h"
-#include "../../stockfish/src/psqt.h"
-#include "../../stockfish/src/search.h"
-#include "../../stockfish/src/thread.h"
-#include "../../stockfish/src/tt.h"
+#include "../../stockfish/src/types.h"
 #include "../../stockfish/src/uci.h"
-#include "../../stockfish/src/syzygy/tbprobe.h"
+#include "../../stockfish/src/tune.h"
 #include "../../lib/threadbuf.h"
 #include "Stockfish.hpp"
 #include "StockfishSendOutput.h"
 
-
-namespace CapacitorStockfish
-{
+namespace CapacitorStockfish {
   using namespace Stockfish;
   static std::string CMD_EXIT = "stockfish:exit";
+  static UCIEngine* uci = nullptr;
 
   auto readstdout = [](void *bridge) {
     std::streambuf* out = std::cout.rdbuf();
@@ -39,40 +35,37 @@ namespace CapacitorStockfish
       }
     };
 
-    // Restore output standard
     std::cout.rdbuf(out);
-
     lichbuf.close();
   };
 
   std::thread reader;
 
   void init(void *bridge) {
+    std::cout << engine_info() << std::endl;
+    
     reader = std::thread(readstdout, bridge);
 
-    UCI::init(Options);
-    Tune::init();
-    PSQT::init();
     Bitboards::init();
     Position::init();
-    Bitbases::init();
-    Endgames::init();
-    Threads.set(size_t(Options["Threads"]));
-    Search::clear(); // After threads are up
-#ifndef NNUE_EMBEDDING_OFF
-    Eval::NNUE::init();
-#endif
+
+    // Create UCI engine with no command line arguments
+    uci = new UCIEngine(0, nullptr);
+    Tune::init(uci->engine_options());
   }
 
   void cmd(std::string cmd) {
-    UCI::command(cmd);
+      using namespace Stockfish;
+      uci->command(cmd);
   }
 
   void exit() {
-    UCI::command("quit");
+      uci->command("quit");
     sync_cout << CMD_EXIT << sync_endl;
     reader.join();
-    Threads.set(0);
+    if (uci) {
+        delete uci;
+        uci = nullptr;
+    }
   }
 }
-

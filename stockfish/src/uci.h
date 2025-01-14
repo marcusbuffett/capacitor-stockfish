@@ -40,7 +40,7 @@ class UCIEngine {
    public:
     UCIEngine(int argc, char** argv);
 
-    void loop();
+    void command(const std::string& input_cmd);
 
     static int         to_cp(Value v, const Position& pos);
     static std::string format_score(const Score& s);
