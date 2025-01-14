@@ -26,12 +26,12 @@ Capacitor.
 ### getMaxMemory()
 
 ```typescript
-getMaxMemory() => Promise<{ value: number; }>
+getMaxMemory() => any
 ```
 
 Returns the maximum number of MB that can be used by the engine.
 
-**Returns:** <code>Promise&lt;{ value: number; }&gt;</code>
+**Returns:** <code>any</code>
 
 --------------------
 
@@ -39,13 +39,13 @@ Returns the maximum number of MB that can be used by the engine.
 ### getCPUArch()
 
 ```typescript
-getCPUArch() => Promise<{ value: string; }>
+getCPUArch() => any
 ```
 
 Returns CPU architecture.
 Possible values are: armeabi, armeabi-v7a, arm64-v8a, x86, x86_64, mips, mips64.
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+**Returns:** <code>any</code>
 
 --------------------
 
@@ -53,10 +53,12 @@ Possible values are: armeabi, armeabi-v7a, arm64-v8a, x86, x86_64, mips, mips64.
 ### start()
 
 ```typescript
-start() => Promise<void>
+start() => any
 ```
 
 Initialize the engine. You must call this method before sending commands.
+
+**Returns:** <code>any</code>
 
 --------------------
 
@@ -64,7 +66,7 @@ Initialize the engine. You must call this method before sending commands.
 ### cmd(...)
 
 ```typescript
-cmd(options: { cmd: string; }) => Promise<void>
+cmd(options: { cmd: string; }) => any
 ```
 
 Sends a command to the engine. You can listen to the output using the
@@ -74,16 +76,20 @@ Sends a command to the engine. You can listen to the output using the
 | ------------- | ----------------------------- |
 | **`options`** | <code>{ cmd: string; }</code> |
 
+**Returns:** <code>any</code>
+
 --------------------
 
 
 ### exit()
 
 ```typescript
-exit() => Promise<void>
+exit() => any
 ```
 
 Stops the engine.
+
+**Returns:** <code>any</code>
 
 --------------------
 
