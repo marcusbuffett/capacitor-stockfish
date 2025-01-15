@@ -64,10 +64,10 @@ public class Stockfish: CAPPlugin {
         ])
     }
     
-    @objc func getMaxConcurrency(_ call: CAPPluginCall) {
-        let maxMemInMb = (ProcessInfo().physicalMemory / 16) / (1024 * 1024)
+    @objc func getProcessorCount(_ call: CAPPluginCall) {
+        let maxConcurrency = ProcessInfo().processorCount
         call.resolve([
-            "value": maxMemInMb
+            "value": maxConcurrency
         ])
     }
 

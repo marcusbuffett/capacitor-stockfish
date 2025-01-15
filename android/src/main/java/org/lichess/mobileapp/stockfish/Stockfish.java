@@ -62,16 +62,11 @@ public final class Stockfish extends Plugin {
   }
 
   @PluginMethod
-  public void getMaxMemory(PluginCall call) {
-    Context context = getContext();
-    ActivityManager actManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
-    actManager.getMemoryInfo(memInfo);
-    // allow max 1/16th of total mem
-    long maxMemInMB = (memInfo.totalMem / 16) / (1024L * 1024L);
-    JSObject ret = new JSObject();
-    ret.put("value", maxMemInMB);
-    call.success(ret);
+  public void getProcessorCount(PluginCall call) {
+      int processorCount = Runtime.getRuntime().availableProcessors();
+      JSObject ret = new JSObject();
+      ret.put("value", processorCount);
+      call.success(ret);
   }
 
   @PluginMethod

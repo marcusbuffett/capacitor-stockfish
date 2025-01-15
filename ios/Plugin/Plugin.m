@@ -6,6 +6,7 @@
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
 CAP_PLUGIN(Stockfish, "Stockfish",
            CAP_PLUGIN_METHOD(getMaxMemory, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getProcessorCount, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(get, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCPUArch, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(start, CAPPluginReturnCallback);
