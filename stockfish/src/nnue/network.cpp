@@ -46,8 +46,8 @@
 //     const unsigned int         gEmbeddedNNUESize;    // the size of the embedded file
 // Note that this does not work in Microsoft Visual Studio.
 #if !defined(_MSC_VER) && !defined(NNUE_EMBEDDING_OFF)
-INCBIN(EmbeddedNNUEBig, EvalFileDefaultNameBig);
-INCBIN(EmbeddedNNUESmall, EvalFileDefaultNameSmall);
+INCBIN(EmbeddedNNUEBig, "/Users/marcusbuffett/projects/capacitor-stockfish/stockfish/src/" EvalFileDefaultNameBig);
+INCBIN(EmbeddedNNUESmall, "/Users/marcusbuffett/projects/capacitor-stockfish/stockfish/src/" EvalFileDefaultNameSmall);
 #else
 const unsigned char        gEmbeddedNNUEBigData[1]   = {0x0};
 const unsigned char* const gEmbeddedNNUEBigEnd       = &gEmbeddedNNUEBigData[1];
@@ -242,6 +242,8 @@ void Network<Arch, Transformer>::verify(std::string                             
     if (evalfilePath.empty())
         evalfilePath = evalFile.defaultName;
 
+    std::cout << evalfilePath << std::endl;
+    std::string currentEvalFile = evalFile.current;
     if (evalFile.current != evalfilePath)
     {
         if (f)

@@ -1,6 +1,6 @@
 import XCTest
 import Capacitor
-@testable import Plugin
+import CapacitorStockfish
 
 class PluginTests: XCTestCase {
 
@@ -19,17 +19,31 @@ class PluginTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
 
         let value = "Hello, World!"
-        let plugin = MyPlugin()
+        let stockfish = Stockfish()
+        let plugin = StockfishBridge(plugin: stockfish)
+        print("plugin: \(plugin!)")
 
         let call = CAPPluginCall(callbackId: "test", options: [
             "value": value
         ], success: { (result, _) in
-            let resultValue = result!.data["value"] as? String
+            let resultValue = result!.data!["value"] as? String
             XCTAssertEqual(value, resultValue)
         }, error: { (_) in
             XCTFail("Error shouldn't have been called")
         })
+        
 
-        plugin.echo(call!)
+        plugin!.start()
+        plugin!.cmd("go nodes 1000")
+        
+        let expectation = XCTestExpectation(description: "Wait for 60 seconds")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 60.0) {
+            expectation.fulfill()
+        }
+        plugin!.exit();
+        
+        wait(for: [expectation], timeout: 61.0)
+
+
     }
 }

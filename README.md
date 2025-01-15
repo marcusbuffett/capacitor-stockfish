@@ -13,6 +13,7 @@ Capacitor.
 <docgen-index>
 
 * [`getMaxMemory()`](#getmaxmemory)
+* [`getProcessorCount()`](#getprocessorcount)
 * [`getCPUArch()`](#getcpuarch)
 * [`start()`](#start)
 * [`cmd(...)`](#cmd)
@@ -30,6 +31,19 @@ getMaxMemory() => any
 ```
 
 Returns the maximum number of MB that can be used by the engine.
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### getProcessorCount()
+
+```typescript
+getProcessorCount() => any
+```
+
+Returns the number of processors available to the engine.
 
 **Returns:** <code>any</code>
 

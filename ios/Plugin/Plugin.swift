@@ -6,9 +6,16 @@ public class Stockfish: CAPPlugin {
     
     private var stockfish: StockfishBridge?
     private var isInit = false
+    private var onStartedCallback: CAPPluginCall?
     
     private let template = "{\"output\": \"%@\"}"
     @objc public func sendOutput(_ output: String) {
+        print("Sending output \(output)")
+        if (onStartedCallback != nil) {
+            print("Resolving the started callback!")
+            onStartedCallback?.resolve()
+            onStartedCallback = nil
+        }
         bridge?.triggerWindowJSEvent(eventName: "stockfish", data: String(format: template, output))
     }
 
@@ -56,14 +63,23 @@ public class Stockfish: CAPPlugin {
             "value": maxMemInMb
         ])
     }
+    
+    @objc func getMaxConcurrency(_ call: CAPPluginCall) {
+        let maxMemInMb = (ProcessInfo().physicalMemory / 16) / (1024 * 1024)
+        call.resolve([
+            "value": maxMemInMb
+        ])
+    }
 
     @objc func start(_ call: CAPPluginCall) {
+        print("Setting the callback thing")
+        call.keepAlive = true
         if (!isInit) {
             stockfish = StockfishBridge(plugin: self)
             stockfish?.start()
             isInit = true
         }
-        call.resolve()
+        self.onStartedCallback = call
     }
 
     @objc func cmd(_ call: CAPPluginCall) {
@@ -72,6 +88,8 @@ public class Stockfish: CAPPlugin {
                 call.reject("Must provide a cmd")
                 return
             }
+            print("Sending cmd \(cmd)")
+
             stockfish?.cmd(cmd)
             call.resolve()
         } else {

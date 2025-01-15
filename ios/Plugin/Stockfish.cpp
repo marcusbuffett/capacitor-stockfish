@@ -50,8 +50,8 @@ namespace CapacitorStockfish {
     Position::init();
 
     // Create UCI engine with no command line arguments
-    uci = new UCIEngine(0, nullptr);
-    Tune::init(uci->engine_options());
+      char* argv[] = {const_cast<char*>("stockfish")};  // Program name as first arg
+      uci = new UCIEngine(0, argv);
   }
 
   void cmd(std::string cmd) {

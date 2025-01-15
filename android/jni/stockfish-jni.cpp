@@ -2,14 +2,11 @@
 #include <android/log.h>
 #include <string>
 #include "bitboard.h"
-#include "endgame.h"
+#include "misc.h"
 #include "position.h"
-#include "psqt.h"
-#include "search.h"
-#include "syzygy/tbprobe.h"
-#include "thread.h"
-#include "tt.h"
+#include "types.h"
 #include "uci.h"
+#include "tune.h"
 #include "threadbuf.h"
 
 using namespace Stockfish;
@@ -25,6 +22,7 @@ extern "C" {
 static JavaVM *jvm;
 static jobject jobj;
 static jmethodID onMessage;
+static UCIEngine* uci = nullptr;
 
 static std::string CMD_EXIT = "stockfish:exit";
 
@@ -34,7 +32,6 @@ auto readstdout = []() {
   jvm->GetEnv((void **)&jenv, JNI_VERSION_1_6);
   jvm->AttachCurrentThread(&jenv, (void*) NULL);
 
-  // Save standard output
   std::streambuf* out = std::cout.rdbuf();
 
   threadbuf lichbuf(8, 8096);
@@ -51,7 +48,7 @@ auto readstdout = []() {
       const char* coutput = line.c_str();
       int len = strlen(coutput);
       jbyteArray aoutput = jenv->NewByteArray(len);
-      jenv->SetByteArrayRegion (aoutput, 0, len, (jbyte*)coutput);
+      jenv->SetByteArrayRegion(aoutput, 0, len, (jbyte*)coutput);
       jenv->CallVoidMethod(jobj, onMessage, aoutput);
       jenv->DeleteLocalRef(aoutput);
     } else {
@@ -59,9 +56,7 @@ auto readstdout = []() {
     }
   };
 
-  // Restore output standard
   std::cout.rdbuf(out);
-
   lichbuf.close();
   jvm->DetachCurrentThread();
 };
@@ -74,31 +69,32 @@ JNIEXPORT void JNICALL Java_org_lichess_mobileapp_stockfish_Stockfish_jniInit(JN
   jclass classStockfish = env->GetObjectClass(obj);
   onMessage = env->GetMethodID(classStockfish, "onMessage", "([B)V");
 
+  std::cout << engine_info() << std::endl;
+
   reader = std::thread(readstdout);
 
-  UCI::init(Options);
-  Tune::init();
-  PSQT::init();
   Bitboards::init();
   Position::init();
-  Bitbases::init();
-  Endgames::init();
-  Threads.set(size_t(Options["Threads"]));
-  Search::clear(); // After threads are up
-#ifndef NNUE_EMBEDDING_OFF
-  Eval::NNUE::init();
-#endif
+
+  // Create UCI engine with no command line arguments
+  char* argv[] = {const_cast<char*>("stockfish")};  // Program name as first arg
+  uci = new UCIEngine(0, argv);
 }
 
 JNIEXPORT void JNICALL Java_org_lichess_mobileapp_stockfish_Stockfish_jniExit(JNIEnv *env, jobject obj) {
-  UCI::command("quit");
-  sync_cout << CMD_EXIT << sync_endl;
-  reader.join();
-  Threads.set(0);
+  if (uci) {
+    uci->command("quit");
+    sync_cout << CMD_EXIT << sync_endl;
+    reader.join();
+    delete uci;
+    uci = nullptr;
+  }
 }
 
 JNIEXPORT void JNICALL Java_org_lichess_mobileapp_stockfish_Stockfish_jniCmd(JNIEnv *env, jobject obj, jstring jcmd) {
   const char *cmd = env->GetStringUTFChars(jcmd, (jboolean *)0);
-  UCI::command(cmd);
+  if (uci) {
+    uci->command(cmd);
+  }
   env->ReleaseStringUTFChars(jcmd, cmd);
 }
