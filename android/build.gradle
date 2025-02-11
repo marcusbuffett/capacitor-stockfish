@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.library'
+    id 'com.android.library' version '8.2.0'
 }
 
 repositories {
@@ -20,7 +20,7 @@ android {
     compileSdk 33
     
     defaultConfig {
-        minSdk 24
+        minSdk 25
         targetSdk 33
         versionCode 1
         versionName "1.0"
