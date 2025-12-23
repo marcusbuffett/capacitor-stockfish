@@ -43,9 +43,9 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepare": "npm run build",
-    "postinstall": "bun install && bun run build"
+    "postinstall": "bun run build"
   },
-  "devDependencies": {
+  "dependencies": {
     "@capacitor/android": "^6.0.0",
     "@capacitor/core": "^6.0.0",
     "@capacitor/docgen": "0.0.18",
